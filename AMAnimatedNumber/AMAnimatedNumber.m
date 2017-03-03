@@ -75,7 +75,14 @@
         
         _labelsList = [self generateLabels];
         CGRect frame = _maskView.frame;
-        frame.size.height = _labelsList.firstObject.frame.size.height;
+        {
+            UILabel *label = [[UILabel alloc] init];
+            label.numberOfLines = 0;
+            label.text = @"1";
+            label.font = _textFont == nil ? [UIFont systemFontOfSize:17.f]:_textFont;
+            [label sizeToFit];
+            frame.size.height = CGRectGetHeight(label.frame);
+        }
         _maskView.frame = frame;
         
     }
