@@ -62,10 +62,18 @@
     [self setup];
     
     [self setupLabels];
-    
+    [self centerLabels];
     [self updateLabelsLayoutWithAnimated:animated];
 }
-
+-(void)centerLabels{
+    UILabel *lastView = _labelsList.lastObject;
+    CGFloat offset = (CGRectGetWidth(_maskView.bounds) - CGRectGetMaxX(lastView.frame)) / 2;
+    for (UILabel *each in _labelsList) {
+        each.frame = CGRectOffset(each.frame, offset, 0);
+    }
+    
+    _maskView.frame = CGRectOffset(_maskView.bounds, 0, (CGRectGetHeight(self.bounds) - CGRectGetHeight(_maskView.bounds)) / 2);
+}
 - (void)setupLabels
 {
     for (UIView *view in _maskView.subviews) {
