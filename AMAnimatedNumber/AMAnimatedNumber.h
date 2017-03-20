@@ -54,6 +54,6 @@ typedef NS_ENUM(NSInteger, AMAnimateNumberDirection)
  */
 - (void)setNumbers:(NSString *)numbers animated:(BOOL)animated direction:(AMAnimateNumberDirection)direction;
 
-
+- (void)setNumbers:(NSString *)numbers animated:(BOOL)animated alignment:(NSTextAlignment)textAlignment;
 
 @end

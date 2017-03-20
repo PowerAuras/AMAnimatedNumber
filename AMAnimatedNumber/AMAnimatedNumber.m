@@ -44,16 +44,25 @@
         _maskView = [[UIView alloc] initWithFrame:self.bounds];
         _maskView.backgroundColor = [UIColor clearColor];
         _maskView.clipsToBounds = YES;
+                _maskView.layer.borderColor = [UIColor purpleColor].CGColor;
+                _maskView.layer.borderWidth = 1;
+
         [self addSubview:_maskView];
     }
 }
 
 - (void)setNumbers:(NSString *)numbers animated:(BOOL)animated
 {
-    [self setNumbers:numbers animated:animated direction:AMAnimateNumberDirectionUp];
+    [self setNumbers:numbers animated:animated direction:AMAnimateNumberDirectionUp alignment:NSTextAlignmentLeft];
 }
-
-- (void)setNumbers:(NSString *)numbers animated:(BOOL)animated direction:(AMAnimateNumberDirection)direction
+- (void)setNumbers:(NSString *)numbers animated:(BOOL)animated alignment:(NSTextAlignment)textAlignment
+{
+    [self setNumbers:numbers animated:animated direction:AMAnimateNumberDirectionUp alignment:textAlignment];
+}
+- (void)setNumbers:(NSString *)numbers animated:(BOOL)animated direction:(AMAnimateNumberDirection)direction{
+    [self setNumbers:numbers animated:animated direction:direction alignment:NSTextAlignmentLeft];
+}
+- (void)setNumbers:(NSString *)numbers animated:(BOOL)animated direction:(AMAnimateNumberDirection)direction alignment:(NSTextAlignment)textAlignment;
 {
     _numbers = numbers;
     _direction = direction;
@@ -62,8 +71,31 @@
     [self setup];
     
     [self setupLabels];
-    [self centerLabels];
+    switch (textAlignment) {
+        case NSTextAlignmentLeft:
+            
+            break;
+        case NSTextAlignmentCenter:
+            [self centerLabels];
+            break;
+        case NSTextAlignmentRight:
+            [self rightAlignment];
+            break;
+        default:
+            break;
+    }
     [self updateLabelsLayoutWithAnimated:animated];
+}
+-(void)rightAlignment{
+    
+    UILabel *lastView = _labelsList.lastObject;
+    CGFloat offset = (CGRectGetWidth(_maskView.bounds) - CGRectGetMaxX(lastView.frame));
+    for (UILabel *each in _labelsList) {
+        each.frame = CGRectOffset(each.frame, offset, 0);
+    }
+    
+    _maskView.frame = CGRectOffset(_maskView.bounds, 0, (CGRectGetHeight(self.bounds) - CGRectGetHeight(_maskView.bounds)) / 2);
+
 }
 -(void)centerLabels{
     UILabel *lastView = _labelsList.lastObject;
