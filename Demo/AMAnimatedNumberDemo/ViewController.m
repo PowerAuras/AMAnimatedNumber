@@ -46,15 +46,19 @@
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
-
+- (IBAction)changeNumber:(UIButton *)sender {
+    [self.view endEditing:YES];
+    [_animateNumber changeNumers:_textField.text];
+}
 - (IBAction)onSetNumberButtonClicked:(UIButton *)sender {
     [self.view endEditing:YES];
+    [_animateNumber setMaxNumber:5];
     [_animateNumber setTextFont:[UIFont boldSystemFontOfSize:26]];
     [_animateNumber setTextColor:[UIColor brownColor]];
     
     [_animateNumber setNumbers:_textField.text
                       animated:_swtich.on
-                     direction:_segmentedControl.selectedSegmentIndex == 0 ? AMAnimateNumberDirectionUp:AMAnimateNumberDirectionDown];
+                        alignment:NSTextAlignmentRight];
 }
 
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event

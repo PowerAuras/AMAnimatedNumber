@@ -32,18 +32,19 @@
     NSArray <UILabel *> *_labelsList;
     UIView *_maskView;
     NSString *_numbers;
+    int _maxNumber;
 }
 
 
 - (void)setup
 {
     if (_allNumbersList == nil) {
-        _allNumbersList = @[@"0",@"1",@"2",@"3",@"4",@"5",@"6",@"7",@"8",@"9"];
+        _allNumbersList = @[@"0",@"1",@"2",@"3",@"4",@"5",@"6",@"7",@"8",@"9",@"."];
     }
     if (_maskView == nil) {
         _maskView = [[UIView alloc] initWithFrame:self.bounds];
         _maskView.backgroundColor = [UIColor clearColor];
-        _maskView.clipsToBounds = YES;
+//        _maskView.clipsToBounds = YES;
                 _maskView.layer.borderColor = [UIColor purpleColor].CGColor;
                 _maskView.layer.borderWidth = 1;
 
@@ -62,6 +63,7 @@
 - (void)setNumbers:(NSString *)numbers animated:(BOOL)animated direction:(AMAnimateNumberDirection)direction{
     [self setNumbers:numbers animated:animated direction:direction alignment:NSTextAlignmentLeft];
 }
+
 - (void)setNumbers:(NSString *)numbers animated:(BOOL)animated direction:(AMAnimateNumberDirection)direction alignment:(NSTextAlignment)textAlignment;
 {
     _numbers = numbers;
@@ -71,6 +73,7 @@
     [self setup];
     
     [self setupLabels];
+    
     switch (textAlignment) {
         case NSTextAlignmentLeft:
             
@@ -85,6 +88,13 @@
             break;
     }
     [self updateLabelsLayoutWithAnimated:animated];
+}
+-(void)setMaxNumber:(int)mnum{
+    _maxNumber = mnum;
+}
+-(void)changeNumers:(NSString *)numbers{
+    _numbers = numbers;
+    [self updateLabelsLayoutWithAnimated:YES];
 }
 -(void)rightAlignment{
     
@@ -127,40 +137,62 @@
         
     }
 }
-
+- (BOOL)isPureInt:(NSString*)string{
+    NSScanner* scan = [NSScanner scannerWithString:string];
+    NSInteger val;
+    return [scan scanInteger:&val] && [scan isAtEnd];
+}
+//初始化maxNumber个一长溜label，均显示在视野外
 - (NSArray *)generateLabels
 {
     NSMutableArray<UILabel *> *labelsList = [NSMutableArray array];
-    for (int i = 0; i < _numbers.length; i++) {
-        NSString *stringItem = [_numbers substringWithRange:NSMakeRange(i, 1)];
-        if ([self isNumberType:stringItem]) {
-            NSString *text = [_allNumbersList componentsJoinedByString:@"\n"];
-            UILabel *label = [self createLabels:text];
-            
-            CGRect frame = label.frame;
-            frame.origin.x = labelsList.count > 0 ? CGRectGetMaxX(labelsList.lastObject.frame) : 0;
-            frame.origin.y = stringItem.integerValue * label.bounds.size.height/_allNumbersList.count;
-            label.frame = frame;
-            [labelsList addObject:label];
-        }else {
-            UILabel *label = [self createLabels:stringItem];
-            
-            CGRect frame = label.frame;
-            frame.origin.x = labelsList.count > 0 ? CGRectGetMaxX(labelsList.lastObject.frame) : 0;
-            frame.origin.y = label.bounds.size.height;
-            label.frame = frame;
-            [labelsList addObject:label];
-        }
+    for (int i = 0; i < _maxNumber; i++) {
+        //创建maxNumber个一长溜label，originY可能是数字0-9、小数点.、无
+//        NSString *stringItem = [_numbers substringWithRange:NSMakeRange(i, 1)];
+        //        if ([self isNumberType:stringItem]) {
+        NSString *text = [_allNumbersList componentsJoinedByString:@"\n"];
+        UILabel *label = [self createLabels:text];//一长溜的label
+        
+        CGRect frame = label.frame;
+        //每个number对应一个labelsList中的一个一长溜label，originX排排队
+        frame.origin.x = labelsList.count > 0 ? CGRectGetMaxX(labelsList.lastObject.frame) : 0;
+//        BOOL ispint = [self isPureInt:stringItem];
+        //每个number对应的labelsList滚动到number位置
+//        NSInteger stringIndex = ispint?stringItem.integerValue:10;
+        frame.origin.y =
+        label.bounds.size.height/_allNumbersList.count;
+//        -stringIndex * label.bounds.size.height/_allNumbersList.count;
+        label.frame = frame;
+        [labelsList addObject:label];
+        //        }else {
+        //            UILabel *label = [self createLabels:stringItem];
+        //
+        //            CGRect frame = label.frame;
+        //            frame.origin.x = labelsList.count > 0 ? CGRectGetMaxX(labelsList.lastObject.frame) : 0;
+        //            frame.origin.y = label.bounds.size.height;
+        //            label.frame = frame;
+        //            [labelsList addObject:label];
+        //        }
     }
     return labelsList;
 }
 
 - (void)updateLabelsLayoutWithAnimated:(BOOL)animated
 {
-    for (int i = 0; i < _numbers.length; i++) {
-        NSString *stringItem = [_numbers substringWithRange:NSMakeRange(i, 1)];
+    //1402
+    // 402
+    //计算目标string的位置，string可能是无、.、0-9
+    for (int i = (int)(_maxNumber - 1); i >= 0; i--) {
+        NSString *stringItem = nil;
+        NSInteger j = i - (_maxNumber - _numbers.length);
+        if (j >= 0) {
+            stringItem = [_numbers substringWithRange:NSMakeRange(j, 1)];
+        }
+        
         UILabel *label = _labelsList[i];
-        BOOL isNumber = [self isNumberType:stringItem];
+        
+        BOOL ispint = [self isPureInt:stringItem];
+        NSInteger stringIndex = stringItem?(ispint?stringItem.integerValue:10):-1;
        
         
         if (animated) {
@@ -172,12 +204,8 @@
             [UIView animateWithDuration:0.6 delay:0.1+0.02*i options:UIViewAnimationOptionCurveEaseOut animations:^{
                 
                 CGRect frame = label.frame;
-                if (isNumber) {
-                    frame.origin.y = -stringItem.integerValue * label.bounds.size.height/_allNumbersList.count;
-                    
-                }else {
-                    frame.origin.y = 0;
-                }
+                frame.origin.y = -stringIndex * label.bounds.size.height/_allNumbersList.count;
+                
                 label.frame = frame;
                 
             } completion:^(BOOL finished) {
@@ -185,7 +213,7 @@
             }];
         }else {
             CGRect frame = label.frame;
-            frame.origin.y = -stringItem.integerValue * label.bounds.size.height/_allNumbersList.count;
+            frame.origin.y = -stringIndex * label.bounds.size.height/_allNumbersList.count;
             label.frame = frame;
         }
             

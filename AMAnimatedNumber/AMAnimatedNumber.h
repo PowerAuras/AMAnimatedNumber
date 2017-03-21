@@ -56,4 +56,6 @@ typedef NS_ENUM(NSInteger, AMAnimateNumberDirection)
 
 - (void)setNumbers:(NSString *)numbers animated:(BOOL)animated alignment:(NSTextAlignment)textAlignment;
 
+-(void)changeNumers:(NSString *)numbers;
+-(void)setMaxNumber:(int)mnum;
 @end
