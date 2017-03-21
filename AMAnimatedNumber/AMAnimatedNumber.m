@@ -44,9 +44,9 @@
     if (_maskView == nil) {
         _maskView = [[UIView alloc] initWithFrame:self.bounds];
         _maskView.backgroundColor = [UIColor clearColor];
-//        _maskView.clipsToBounds = YES;
-                _maskView.layer.borderColor = [UIColor purpleColor].CGColor;
-                _maskView.layer.borderWidth = 1;
+        _maskView.clipsToBounds = YES;
+//                _maskView.layer.borderColor = [UIColor purpleColor].CGColor;
+//                _maskView.layer.borderWidth = 1;
 
         [self addSubview:_maskView];
     }
@@ -121,8 +121,8 @@
     for (UIView *view in _maskView.subviews) {
         [view removeFromSuperview];
     }
-    if (_numbers != nil && _numbers.length > 0) {
-        
+//    if (_numbers != nil && _numbers.length > 0) {
+    
         _labelsList = [self generateLabels];
         CGRect frame = _maskView.frame;
         {
@@ -135,7 +135,7 @@
         }
         _maskView.frame = frame;
         
-    }
+//    }
 }
 - (BOOL)isPureInt:(NSString*)string{
     NSScanner* scan = [NSScanner scannerWithString:string];
@@ -201,8 +201,7 @@
                 frame.origin.y = -label.bounds.size.height;
                 label.frame = frame;
             }
-            [UIView animateWithDuration:0.6 delay:0.1+0.02*i options:UIViewAnimationOptionCurveEaseOut animations:^{
-                
+            [UIView animateWithDuration:.6 delay:0.1+0.02*i usingSpringWithDamping:0.75 initialSpringVelocity:5 options:UIViewAnimationOptionAllowUserInteraction animations:^{
                 CGRect frame = label.frame;
                 frame.origin.y = -stringIndex * label.bounds.size.height/_allNumbersList.count;
                 
@@ -211,6 +210,17 @@
             } completion:^(BOOL finished) {
                 
             }];
+
+//            [UIView animateWithDuration:0.6 delay:0.1+0.02*i options:UIViewAnimationOptionCurveEaseOut animations:^{
+//                
+//                CGRect frame = label.frame;
+//                frame.origin.y = -stringIndex * label.bounds.size.height/_allNumbersList.count;
+//                
+//                label.frame = frame;
+//                
+//            } completion:^(BOOL finished) {
+//                
+//            }];
         }else {
             CGRect frame = label.frame;
             frame.origin.y = -stringIndex * label.bounds.size.height/_allNumbersList.count;
