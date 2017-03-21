@@ -191,7 +191,7 @@
         
         UILabel *label = _labelsList[i];
         
-        BOOL ispint = [self isPureInt:stringItem];
+        BOOL ispint = stringItem?[self isPureInt:stringItem]:NO;
         NSInteger stringIndex = stringItem?(ispint?stringItem.integerValue:10):-1;
        
         
