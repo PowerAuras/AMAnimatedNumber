@@ -39,7 +39,7 @@
 - (void)setup
 {
     if (_allNumbersList == nil) {
-        _allNumbersList = @[@"0",@"1",@"2",@"3",@"4",@"5",@"6",@"7",@"8",@"9",@"."];
+        _allNumbersList = @[@"0",@"1",@"2",@"3",@"4",@"5",@"6",@"7",@"8",@"9",@".",@"-"];
     }
     if (_maskView == nil) {
         _maskView = [[UIView alloc] initWithFrame:self.bounds];
@@ -156,23 +156,10 @@
         CGRect frame = label.frame;
         //每个number对应一个labelsList中的一个一长溜label，originX排排队
         frame.origin.x = labelsList.count > 0 ? CGRectGetMaxX(labelsList.lastObject.frame) : 0;
-//        BOOL ispint = [self isPureInt:stringItem];
-        //每个number对应的labelsList滚动到number位置
-//        NSInteger stringIndex = ispint?stringItem.integerValue:10;
-        frame.origin.y =
-        label.bounds.size.height/_allNumbersList.count;
-//        -stringIndex * label.bounds.size.height/_allNumbersList.count;
+        //初始均在下方不露头
+        frame.origin.y = label.bounds.size.height/_allNumbersList.count;
         label.frame = frame;
         [labelsList addObject:label];
-        //        }else {
-        //            UILabel *label = [self createLabels:stringItem];
-        //
-        //            CGRect frame = label.frame;
-        //            frame.origin.x = labelsList.count > 0 ? CGRectGetMaxX(labelsList.lastObject.frame) : 0;
-        //            frame.origin.y = label.bounds.size.height;
-        //            label.frame = frame;
-        //            [labelsList addObject:label];
-        //        }
     }
     return labelsList;
 }
@@ -181,7 +168,7 @@
 {
     //1402
     // 402
-    //计算目标string的位置，string可能是无、.、0-9
+    //计算目标string的位置，string可能是无、.、0-9、-
     for (int i = (int)(_maxNumber - 1); i >= 0; i--) {
         NSString *stringItem = nil;
         NSInteger j = i - (_maxNumber - _numbers.length);
@@ -192,8 +179,18 @@
         UILabel *label = _labelsList[i];
         
         BOOL ispint = stringItem?[self isPureInt:stringItem]:NO;
-        NSInteger stringIndex = stringItem?(ispint?stringItem.integerValue:10):-1;
-       
+        NSInteger stringIndex = NSNotFound;
+        if (stringItem) {
+            if (ispint) {
+                stringIndex = stringItem.integerValue;
+            }else if ([stringItem isEqualToString:@"."]){
+                stringIndex = 10;
+            }else if ([stringItem isEqualToString:@"-"]){
+                stringIndex = 11;
+            }
+        }else{
+            stringIndex = -1;//无内容  不露头
+        }
         
         if (animated) {
             if (_direction == AMAnimateNumberDirectionDown) {
